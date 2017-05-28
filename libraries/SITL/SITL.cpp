@@ -135,6 +135,8 @@ const AP_Param::GroupInfo SITL::var_info2[] = {
     // weight on wheels pin
     AP_GROUPINFO("WOW_PIN",     25, SITL,  wow_pin, -1),
 
+    AP_GROUPINFO("GPS_HDG",     26, SITL,  gps_hdg_enabled, 0),
+
     AP_GROUPEND
 };
     
