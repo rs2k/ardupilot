@@ -41,9 +41,6 @@ AP_Notify *AP_Notify::_instance;
 
 #define CONFIG_NOTIFY_DEVICES_MAX 6
 
-#define TOSHIBA_LED_I2C_BUS_INTERNAL    0
-#define TOSHIBA_LED_I2C_BUS_EXTERNAL    1
-
 #ifndef BUILD_DEFAULT_LED_TYPE
 // PX4 boards
 #if CONFIG_HAL_BOARD == HAL_BOARD_PX4
@@ -228,13 +225,19 @@ void AP_Notify::add_backends(void)
 #endif
                 break;
             case Notify_LED_ToshibaLED_I2C_Internal:
-                ADD_BACKEND(new ToshibaLED_I2C(TOSHIBA_LED_I2C_BUS_INTERNAL));
+                FOREACH_I2C_INTERNAL(b) {
+                    ADD_BACKEND(new ToshibaLED_I2C(b));
+                }
                 break;
             case Notify_LED_ToshibaLED_I2C_External:
-                ADD_BACKEND(new ToshibaLED_I2C(TOSHIBA_LED_I2C_BUS_EXTERNAL));
+                FOREACH_I2C_EXTERNAL(b) {
+                    ADD_BACKEND(new ToshibaLED_I2C(b));
+                }
                 break;
             case Notify_LED_PCA9685LED_I2C_External:
-                ADD_BACKEND(new PCA9685LED_I2C());
+                FOREACH_I2C_EXTERNAL(b) {
+                    ADD_BACKEND(new PCA9685LED_I2C(b));
+                }
                 break;
             case Notify_LED_OreoLED:
                 // OreoLED's are PX4-v3 build only
