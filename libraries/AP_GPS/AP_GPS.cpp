@@ -264,13 +264,6 @@ const AP_Param::GroupInfo AP_GPS::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("BLEND_TC", 21, AP_GPS, _blend_tc, 10.0f),
 
-    // @Param: HDG_ENABLE
-    // @DisplayName: Use GPS yaw if available
-    // @Description: Enables the ArduPilot system to use the a true heading (yaw) from the GPS if available. This can come from some GPS types which can estimate heading when not moving. An example is some NMEA GPS units which support the HDT NMEA sentence.
-    // @Values: 0:Disabled,1:Enabled
-    // @User: Advanced
-    AP_GROUPINFO("HDG_ENABLE", 22, AP_GPS, _heading_enable, 0),
-
     AP_GROUPEND
 };
 
