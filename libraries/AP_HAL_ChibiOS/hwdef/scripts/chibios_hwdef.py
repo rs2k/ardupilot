@@ -536,6 +536,11 @@ def write_mcu_config(f):
     else:
         env_vars['IOMCU_FW'] = 0
 
+    if get_config('PERIPH_FW', required=False):
+        env_vars['PERIPH_FW'] = get_config('PERIPH_FW')
+    else:
+        env_vars['PERIPH_FW'] = 0
+
     # write any custom STM32 defines
     for d in alllines:
         if d.startswith('STM32_'):
