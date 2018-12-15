@@ -7,4 +7,6 @@ public:
     void update();
 
 private:
+    void can_start();
+    void can_update();
 };

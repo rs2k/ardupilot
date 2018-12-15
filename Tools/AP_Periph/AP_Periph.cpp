@@ -67,17 +67,20 @@ void AP_Periph_FW::init()
 {
     sdStart(&SD1, &uart1_cfg);
     sdStart(&SD2, &uart2_cfg);
+    can_start();
 }
 
 
 void AP_Periph_FW::update()
 {
-    static uint32_t xx;
-    if (xx++ % 30000 == 0) {
+    static uint32_t last_led_ms;
+    uint32_t now = AP_HAL::millis();
+    if (now - last_led_ms > 1000) {
+        last_led_ms = now;
         palToggleLine(HAL_GPIO_PIN_LED);
-        chnWrite(&SD1, (const uint8_t *)"uart1", 5);
         chnWrite(&SD2, (const uint8_t *)"uart2", 5);
     }
+    can_update();
 }
 
 AP_HAL_MAIN();

@@ -17,8 +17,13 @@ def build(bld):
             'libraries/AP_HAL_ChibiOS/Storage.cpp'
         ]
     )
+
+    # build external libcanard library
+    bld.stlib(source='../../modules/libcanard/canard.c',
+              target='libcanard')
+
     bld.ap_program(
         program_name='AP_Periph',
-        use='AP_Periph_libs',
+        use=['AP_Periph_libs', 'libcanard'],
         program_groups=['bin','AP_Periph'],
     )
