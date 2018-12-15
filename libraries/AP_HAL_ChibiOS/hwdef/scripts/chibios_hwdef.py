@@ -106,7 +106,7 @@ def setup_mcu_type_defaults():
     lib = get_mcu_lib(mcu_type)
     if hasattr(lib, 'pincount'):
         pincount = lib.pincount
-    if mcu_series == "STM32F100":
+    if mcu_series.startswith("STM32F1"):
         vtypes = f1_vtypes
     else:
         vtypes = f4f7_vtypes
@@ -185,7 +185,7 @@ class generic_pin(object):
             self.sig_dir = 'OUTPUT'
         else:
             self.sig_dir = 'INPUT'
-        if mcu_series == "STM32F100" and self.label is not None:
+        if mcu_series.startswith("STM32F1") and self.label is not None:
             self.f1_pin_setup()
 
     def f1_pin_setup(self):
@@ -310,7 +310,7 @@ class generic_pin(object):
 
     def get_ODR(self):
         '''return one of LOW, HIGH'''
-        if mcu_series == "STM32F100":
+        if mcu_series.startswith("STM32F1"):
             return self.get_ODR_F1()
         values = ['LOW', 'HIGH']
         v = 'HIGH'
@@ -375,7 +375,7 @@ class generic_pin(object):
 
     def get_CR(self):
         '''return CR FLAGS'''
-        if mcu_series == "STM32F100":
+        if mcu_series.startswith("STM32F1"):
             return self.get_CR_F1()
         if self.sig_dir != "INPUT":
             speed_values = ['SPEED_LOW', 'SPEED_MEDIUM', 'SPEED_HIGH']
@@ -586,7 +586,7 @@ def write_mcu_config(f):
     lib = get_mcu_lib(mcu_type)
     build_info = lib.build
 
-    if mcu_series == "STM32F100":
+    if mcu_series.startswith("STM32F1"):
         cortex = "cortex-m3"        
         env_vars['CPU_FLAGS'] = ["-mcpu=%s" % cortex]
         build_info['MCU'] = cortex
@@ -1264,7 +1264,7 @@ def write_hwdef_header(outfilename):
     if len(romfs) > 0:
         f.write('#define HAL_HAVE_AP_ROMFS_EMBEDDED_H 1\n')
 
-    if mcu_series == 'STM32F100':
+    if mcu_series.startswith('STM32F1'):
         f.write('''
 /*
  * I/O ports initial setup, this configuration is established soon after reset

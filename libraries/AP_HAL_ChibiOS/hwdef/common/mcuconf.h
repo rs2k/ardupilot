@@ -36,7 +36,7 @@
 #include "hwdef.h"
 
 #pragma once
-#ifdef STM32F100_MCUCONF
+#if defined(STM32F100_MCUCONF) || defined(STM32F103_MCUCONF)
 #include "stm32f1_mcuconf.h"
 #else
 /*

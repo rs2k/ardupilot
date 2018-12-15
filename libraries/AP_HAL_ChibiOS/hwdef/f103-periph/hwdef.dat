@@ -1,9 +1,7 @@
 # hw definition file for processing by chibios_pins.py
 
 # MCU class and specific type
-MCU STM32F100 STM32F100xB
-
-# STM32F103C8
+MCU STM32F103 STM32F103xB
 
 # bootloader starts firmware at 24k
 FLASH_RESERVE_START_KB 24
@@ -77,3 +75,8 @@ define HAL_DISABLE_LOOP_DELAY
 
 define HAL_USE_EMPTY_STORAGE 1
 define HAL_STORAGE_SIZE 16384
+
+# enable CAN support
+define HAL_USE_CAN TRUE
+define STM32_CAN_USE_CAN1 TRUE
+
