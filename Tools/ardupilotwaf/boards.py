@@ -169,6 +169,9 @@ class Board:
             '-Wfatal-errors',
             '-Wno-trigraphs',
         ]
+        env.CFLAGS += [
+            '-std=c99'
+        ]
 
         if 'clang++' in cfg.env.COMPILER_CXX:
             env.CXXFLAGS += [
