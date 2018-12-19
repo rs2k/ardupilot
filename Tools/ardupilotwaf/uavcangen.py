@@ -21,11 +21,25 @@ class uavcangen(Task.Task):
         out = self.env.get_flat('OUTPUT_DIR')
         src = self.env.get_flat('SRC')
         dsdlc = self.env.get_flat("DSDL_COMPILER")
+
+        # work out source directories. We find all directores in an input path
+        # which are below a 'dsdl' directory
+        src_dirs = []
+        for i in self.inputs:
+            path = i.abspath()
+            patha = path.split('/')
+            try:
+                i1 = patha.index('dsdl')
+            except Exception:
+                continue
+            p = '/'.join(patha[:i1+2])
+            if not p in src_dirs:
+                src_dirs.append(p)
+
         input_dir = os.path.dirname(self.inputs[0].abspath())
-        ret = self.exec_command(['{}'.format(python),
-                                 '{}'.format(dsdlc),
-                                 '{}'.format(input_dir),
-                                 '-O{}'.format(out)])
+        cmd = ['{}'.format(python), '{}'.format(dsdlc), '-O{}'.format(out)]
+        cmd += src_dirs
+        ret = self.exec_command(cmd)
 
         if ret != 0:
             # ignore if there was a signal to the interpreter rather
