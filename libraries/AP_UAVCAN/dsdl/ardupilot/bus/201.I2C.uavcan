@@ -1,0 +1,23 @@
+#
+# This service carries I2C request/response to a remote node.
+
+# I2C bus number on the remote node
+uint8 bus
+
+# I2C port number for the request
+uint8 port
+
+# data to write to the I2C bus. Can be empty
+uint8[<=63] buffer
+
+---
+
+# response from the I2C request
+
+# response code
+uint8 I2C_OK = 0
+uint8 I2C_ERR = 1
+uint8 result
+
+# response data
+uint8[<=63] buffer

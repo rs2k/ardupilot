@@ -1,0 +1,8 @@
+# This service is used to find nodes that offer remote I2C
+# services. This message should be broadcast, and the response will be
+# an array of available bus IDs which can be used in I2C messages
+
+---
+
+uint8[<=8] bus_list
+
