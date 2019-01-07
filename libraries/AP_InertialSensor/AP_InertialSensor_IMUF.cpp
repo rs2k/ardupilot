@@ -320,15 +320,15 @@ void AP_InertialSensor_IMUF::read_sensor(void)
     command.param[4]=crc_block((uint32_t *)&command, 5); 
 
     if (!dev->transfer_fullduplex((uint8_t *)&command, (uint8_t *)&data, 50)) {
-        printf("BAD TRANSFER OF IMUF!");
+        //printf("BAD TRANSFER OF IMUF!");
         return;
     }
 
     uint32_t calcedCRC = crc_block( (uint32_t *)(&data), (IMUF_COMM_MODE >> 2) - 1);
 
     if (calcedCRC != data.crc) {
-        printf("BAD CRC!!!!!!!!!!! crc2 0x%08x crc 0x%08x\n", calcedCRC, data.crc);
-        printf("IMUF accel %.2f %.2f %.2f\n", data.accel[0], data.accel[1], data.accel[2]);
+        //printf("BAD CRC!!!!!!!!!!! crc2 0x%08x crc 0x%08x\n", calcedCRC, data.crc);
+        //printf("IMUF accel %.2f %.2f %.2f\n", data.accel[0], data.accel[1], data.accel[2]);
         return;
     }
 
