@@ -32,7 +32,7 @@ extern const AP_HAL::HAL &hal;
 #define EAGLE_TREE_RAW_VALUE_MAX        4048.0f //Max value we can expect from sensor
 #define EAGLE_TREE_RAW_VALUE_MIN        896.0f  //Min value we can expect from the sensor, anything less than this is negative pressure and useless for our needs
 #define EAGLE_TREE_PA_VALUE_MAX         3920.0f //Max value the sensor can read in Pascals
-
+#define EAGLE_TREE_PA_VALUE_MIN         0.0f
 // no temp sensor in Eagle Tree Pitot EXP, use standard day temp, can we pull this from elsewhere?
 #define STANDARD_DAY_TEMP_CELS          15.0f   //SEE: https://en.wikipedia.org/wiki/Standard_day
 
@@ -45,7 +45,6 @@ AP_Airspeed_EAGLETREE::AP_Airspeed_EAGLETREE(AP_Airspeed &_frontend, uint8_t _in
 // probe and initialise the sensor
 bool AP_Airspeed_EAGLETREE::init()
 {
-    uint16_t i = 0;
 
     bool found = false;
 
@@ -99,7 +98,7 @@ float AP_Airspeed_EAGLETREE::_get_pressure(int16_t dp_raw) const
     float rawFloat = constrain_float((float)dp_raw,EAGLE_TREE_RAW_VALUE_MIN,EAGLE_TREE_RAW_VALUE_MAX);
 
     // range the raw data to pascals
-    press = (rawFloat - EAGLE_TREE_RAW_VALUE_MIN) * (EAGLE_TREE_PA_VALUE_MAX - EAGLE_TREE_PA_VALUE_MIN) / (EAGLE_TREE_RAW_VALUE_MAX - EAGLE_TREE_RAW_VALUE_MIN);
+    float press = (rawFloat - EAGLE_TREE_RAW_VALUE_MIN) * (EAGLE_TREE_PA_VALUE_MAX - EAGLE_TREE_PA_VALUE_MIN) / (EAGLE_TREE_RAW_VALUE_MAX - EAGLE_TREE_RAW_VALUE_MIN) + EAGLE_TREE_PA_VALUE_MIN;
 
     return press;
 }
