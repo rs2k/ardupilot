@@ -45,17 +45,12 @@ AP_Airspeed_EAGLETREE::AP_Airspeed_EAGLETREE(AP_Airspeed &_frontend, uint8_t _in
 // probe and initialise the sensor
 bool AP_Airspeed_EAGLETREE::init()
 {
-    const struct {
-        uint8_t bus;
-        uint8_t addr;
-    } addresses[] = {
-        { 1, EAGLETREE_I2C_ADDR },
-        { 0, EAGLETREE_I2C_ADDR },
-        { 2, EAGLETREE_I2C_ADDR },
-    };
+    uint16_t i = 0;
+
     bool found = false;
-    for (uint8_t i=0; i<ARRAY_SIZE(addresses); i++) {
-        _dev = hal.i2c_mgr->get_device(addresses[i].bus, addresses[i].addr);
+
+    FOREACH_I2C_EXTERNAL(i) {
+        _dev = hal.i2c_mgr->get_device(i, EAGLETREE_I2C_ADDR);
         if (!_dev) {
             continue;
         }
@@ -70,7 +65,7 @@ bool AP_Airspeed_EAGLETREE::init()
 
         found = (_last_sample_time_ms != 0);
         if (found) {
-            printf("EAGLETREE: Found sensor on bus %u address 0x%02x\n", addresses[i].bus, addresses[i].addr);
+            printf("EAGLETREE: Found sensor on bus %u address 0x%02x\n", i, EAGLETREE_I2C_ADDR);
             break;
         }
     }
