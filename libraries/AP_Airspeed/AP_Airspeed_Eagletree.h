@@ -27,11 +27,11 @@
 #include "AP_Airspeed_Backend.h"
 #include <AP_HAL/I2CDevice.h>
 
-class AP_Airspeed_ET_PITOT_EXP : public AP_Airspeed_Backend
+class AP_Airspeed_EAGLETREE : public AP_Airspeed_Backend
 {
 public:
-    AP_Airspeed_ET_PITOT_EXP(AP_Airspeed &frontend, uint8_t _instance);
-    ~AP_Airspeed_ET_PITOT_EXP(void) {}
+    AP_Airspeed_EAGLETREE(AP_Airspeed &frontend, uint8_t _instance);
+    ~AP_Airspeed_EAGLETREE(void) {}
     
     // probe and initialise the sensor
     bool init() override;
@@ -46,7 +46,6 @@ private:
     void _measure();
     void _collect();
     void _timer();
-    void _voltage_correction(float &diff_press_pa, float &temperature);
     float _get_pressure(int16_t dp_raw) const;
 
     float _temp_sum;

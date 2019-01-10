@@ -14,9 +14,9 @@
  */
 
 /*
-  backend driver for airspeed from a I2C ET_PITOT_EXP sensor
+  backend driver for airspeed from a I2C EAGLETREE sensor
  */
-#include "AP_Airspeed_ET_PITOT_EXP.h"
+#include "AP_Airspeed_Eagletree.h"
 
 #include <AP_Common/AP_Common.h>
 #include <AP_HAL/AP_HAL.h>
@@ -27,7 +27,7 @@
 
 extern const AP_HAL::HAL &hal;
 
-#define ET_PITOT_EXP_I2C_ADDR 0x4D
+#define EAGLETREE_I2C_ADDR 0x4D
 
 #define EAGLE_TREE_RAW_VALUE_MAX        4048.0f //Max value we can expect from sensor
 #define EAGLE_TREE_RAW_VALUE_MIN        896.0f  //Min value we can expect from the sensor, anything less than this is negative pressure and useless for our needs
@@ -37,21 +37,21 @@ extern const AP_HAL::HAL &hal;
 #define STANDARD_DAY_TEMP_CELS          15.0f   //SEE: https://en.wikipedia.org/wiki/Standard_day
 
 
-AP_Airspeed_ET_PITOT_EXP::AP_Airspeed_ET_PITOT_EXP(AP_Airspeed &_frontend, uint8_t _instance) :
+AP_Airspeed_EAGLETREE::AP_Airspeed_EAGLETREE(AP_Airspeed &_frontend, uint8_t _instance) :
     AP_Airspeed_Backend(_frontend, _instance)
 {
 }
 
 // probe and initialise the sensor
-bool AP_Airspeed_ET_PITOT_EXP::init()
+bool AP_Airspeed_EAGLETREE::init()
 {
     const struct {
         uint8_t bus;
         uint8_t addr;
     } addresses[] = {
-        { 1, ET_PITOT_EXP_I2C_ADDR },
-        { 0, ET_PITOT_EXP_I2C_ADDR },
-        { 2, ET_PITOT_EXP_I2C_ADDR },
+        { 1, EAGLETREE_I2C_ADDR },
+        { 0, EAGLETREE_I2C_ADDR },
+        { 2, EAGLETREE_I2C_ADDR },
     };
     bool found = false;
     for (uint8_t i=0; i<ARRAY_SIZE(addresses); i++) {
@@ -70,12 +70,12 @@ bool AP_Airspeed_ET_PITOT_EXP::init()
 
         found = (_last_sample_time_ms != 0);
         if (found) {
-            printf("ET_PITOT_EXP: Found sensor on bus %u address 0x%02x\n", addresses[i].bus, addresses[i].addr);
+            printf("EAGLETREE: Found sensor on bus %u address 0x%02x\n", addresses[i].bus, addresses[i].addr);
             break;
         }
     }
     if (!found) {
-        printf("ET_PITOT_EXP: no sensor found\n");
+        printf("EAGLETREE: no sensor found\n");
         return false;
     }
 
@@ -83,12 +83,12 @@ bool AP_Airspeed_ET_PITOT_EXP::init()
     _dev->set_retries(2);
     
     _dev->register_periodic_callback(20000,
-                                     FUNCTOR_BIND_MEMBER(&AP_Airspeed_ET_PITOT_EXP::_timer, void));
+                                     FUNCTOR_BIND_MEMBER(&AP_Airspeed_EAGLETREE::_timer, void));
     return true;
 }
 
 // start a measurement
-void AP_Airspeed_ET_PITOT_EXP::_measure()
+void AP_Airspeed_EAGLETREE::_measure()
 {
     _measurement_started_ms = 0;
     uint8_t cmd = 0;
@@ -98,7 +98,7 @@ void AP_Airspeed_ET_PITOT_EXP::_measure()
 }
 
 // scale the raw data to pascals
-float AP_Airspeed_ET_PITOT_EXP::_get_pressure(int16_t dp_raw) const
+float AP_Airspeed_EAGLETREE::_get_pressure(int16_t dp_raw) const
 {
     // constrain the readings to positive values onlt
     float rawFloat = constrain_float((float)dp_raw,EAGLE_TREE_RAW_VALUE_MIN,EAGLE_TREE_RAW_VALUE_MAX);
@@ -110,7 +110,7 @@ float AP_Airspeed_ET_PITOT_EXP::_get_pressure(int16_t dp_raw) const
 }
 
 // read the values from the sensor
-void AP_Airspeed_ET_PITOT_EXP::_collect()
+void AP_Airspeed_EAGLETREE::_collect()
 {
     uint8_t data[2];
     uint8_t data2[2];
@@ -156,9 +156,6 @@ void AP_Airspeed_ET_PITOT_EXP::_collect()
     float press2 = _get_pressure(dp_raw2);
     float temp  = STANDARD_DAY_TEMP_CELS;
     float temp2 = STANDARD_DAY_TEMP_CELS;
-    
-    _voltage_correction(press, temp);
-    _voltage_correction(press2, temp2);
 
     WITH_SEMAPHORE(sem);
 
@@ -170,33 +167,8 @@ void AP_Airspeed_ET_PITOT_EXP::_collect()
     _last_sample_time_ms = AP_HAL::millis();
 }
 
-/**
-   correct for 5V rail voltage if the system_power ORB topic is
-   available
-
-   See http://uav.tridgell.net/MS4525/MS4525-offset.png for a graph of
-   offset versus voltage for 3 sensors
-
-   TODO: Does this apply to the Eagle Tree Pitot EXP Sensor?
- */
-void AP_Airspeed_ET_PITOT_EXP::_voltage_correction(float &diff_press_pa, float &temperature)
-{
-	const float slope = 65.0f;
-	const float temp_slope = 0.887f;
-
-	/*
-	  apply a piecewise linear correction within range given by above graph
-	 */
-	float voltage_diff = hal.analogin->board_voltage() - 5.0f;
-
-    voltage_diff = constrain_float(voltage_diff, -0.7f, 0.5f);
-
-	diff_press_pa -= voltage_diff * slope;
-	temperature -= voltage_diff * temp_slope;
-}
-
 // 50Hz timer
-void AP_Airspeed_ET_PITOT_EXP::_timer()
+void AP_Airspeed_EAGLETREE::_timer()
 {
     if (_measurement_started_ms == 0) {
         _measure();
@@ -210,7 +182,7 @@ void AP_Airspeed_ET_PITOT_EXP::_timer()
 }
 
 // return the current differential_pressure in Pascal
-bool AP_Airspeed_ET_PITOT_EXP::get_differential_pressure(float &pressure)
+bool AP_Airspeed_EAGLETREE::get_differential_pressure(float &pressure)
 {
     if ((AP_HAL::millis() - _last_sample_time_ms) > 100) {
         return false;
@@ -230,7 +202,7 @@ bool AP_Airspeed_ET_PITOT_EXP::get_differential_pressure(float &pressure)
 
 // return the current temperature in degrees C, if available
 // no temp sensor in Eagle Tree Pitot EXP, does this still need to be here?
-bool AP_Airspeed_ET_PITOT_EXP::get_temperature(float &temperature)
+bool AP_Airspeed_EAGLETREE::get_temperature(float &temperature)
 {
     if ((AP_HAL::millis() - _last_sample_time_ms) > 100) {
         return false;

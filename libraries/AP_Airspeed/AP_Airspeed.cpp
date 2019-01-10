@@ -26,7 +26,7 @@
 #include <utility>
 #include "AP_Airspeed.h"
 #include "AP_Airspeed_MS4525.h"
-#include "AP_Airspeed_ET_PITOT_EXP.h"
+#include "AP_Airspeed_Eagletree.h"
 #include "AP_Airspeed_MS5525.h"
 #include "AP_Airspeed_SDP3X.h"
 #include "AP_Airspeed_DLVR.h"
@@ -133,7 +133,7 @@ const AP_Param::GroupInfo AP_Airspeed::var_info[] = {
     // @Param: 2_TYPE
     // @DisplayName: Second Airspeed type
     // @Description: Type of 2nd airspeed sensor
-    // @Values: 0:None,1:I2C-MS4525D0,2:Analog,3:I2C-MS5525,4:I2C-MS5525 (0x76),5:I2C-MS5525 (0x77),6:I2C-SDP3X,7:I2C-DLVR,8:UAVCAN,9:ET_PITOT_EXP
+    // @Values: 0:None,1:I2C-MS4525D0,2:Analog,3:I2C-MS5525,4:I2C-MS5525 (0x76),5:I2C-MS5525 (0x77),6:I2C-SDP3X,7:I2C-DLVR,8:UAVCAN,9:EAGLETREE
     // @User: Standard
     AP_GROUPINFO_FLAGS("2_TYPE", 11, AP_Airspeed, param[1].type, 0, AP_PARAM_FLAG_ENABLE),
 
@@ -237,8 +237,8 @@ void AP_Airspeed::init()
         case TYPE_I2C_MS4525:
             sensor[i] = new AP_Airspeed_MS4525(*this, i);
             break;
-        case TYPE_I2C_ET_PITOT_EXP:
-            sensor[i] = new AP_Airspeed_ET_PITOT_EXP(*this, i);
+        case TYPE_I2C_EAGLETREE:
+            sensor[i] = new AP_Airspeed_EAGLETREE(*this, i);
             break;
         case TYPE_ANALOG:
             sensor[i] = new AP_Airspeed_Analog(*this, i);
