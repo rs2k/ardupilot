@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <utility>
 
-#define IMUF_FIRMWARE_MIN_VERSION 1108
+#define IMUF_FIRMWARE_MIN_VERSION 1109
 #define IMUF_RESET_ATTEMPTS 10
 #define IMUF_COMM_MODE 48
 
@@ -74,14 +74,14 @@ AP_InertialSensor_IMUF::probe(AP_InertialSensor &imu,
 void AP_InertialSensor_IMUF::start()
 {
     printf("IMUF start\n");
-    accel_instance = _imu.register_accel(1000, dev->get_bus_id_devtype(DEVTYPE_INS_IMUF));
-    gyro_instance = _imu.register_gyro(1000,   dev->get_bus_id_devtype(DEVTYPE_INS_IMUF));
+    accel_instance = _imu.register_accel(250, dev->get_bus_id_devtype(DEVTYPE_INS_IMUF));
+    gyro_instance = _imu.register_gyro(250,   dev->get_bus_id_devtype(DEVTYPE_INS_IMUF));
     // setup sensor rotations from probe()
     set_gyro_orientation(gyro_instance, rotation);
     set_accel_orientation(accel_instance, rotation);
     
     // setup callback
-    dev->register_periodic_callback(1000,
+    dev->register_periodic_callback(250,
                                     FUNCTOR_BIND_MEMBER(&AP_InertialSensor_IMUF::read_sensor, void));
     printf("IMUF start done\n");
 }
@@ -218,8 +218,8 @@ void AP_InertialSensor_IMUF::setup_whoami_command(IMUFCommand* cmd)
 void AP_InertialSensor_IMUF::setup_contract(IMUFCommand* cmd, uint32_t imufVersion)
 {
     cmd->command  = IMUF_COMMAND_SETUP;
-    cmd->param[0] = IMUF_COMM_MODE; // gyro+accel+temp+crc
-    cmd->param[1] = (5<<16) | 300; // 2kHz, 300 window
+    cmd->param[0] = IMUF_COMM_MODE; // status+gyro+accel+temp+crc
+    cmd->param[1] = (4<<16) | 900; // 4kHz, 900 window
     cmd->param[2] = (3000<<16) | 3000; // RollQ, PitchQ
     cmd->param[3] = (3000<<16) | 100; // YawQ, RollGyroLPF
     cmd->param[4] = (100<<16) | 100; // pitchGyroLPF, YawGyroLPF
@@ -300,6 +300,7 @@ void AP_InertialSensor_IMUF::read_sensor(void)
 {
     struct PACKED imuCommFrame
     {
+        //uint32_t status_flag;
         float gyro[3];
         float accel[3];
         float temp;

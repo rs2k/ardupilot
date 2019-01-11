@@ -45,6 +45,7 @@ private:
         uint32_t param[10];
         uint32_t crc;
         uint32_t tail;
+        uint8_t  bob;
     };
     /*
       initialise driver
